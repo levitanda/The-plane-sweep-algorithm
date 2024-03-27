@@ -1,3 +1,6 @@
+epsilon = 0.0000000001 #assume there is at least 0.0000001 difference between sequense events
+filename = "input.txt"
+
 class Point:
     x : float # float
     y : float # float
@@ -145,9 +148,6 @@ class CG24PriorityQueue:
             self.arr[i], self.arr[parent] = self.arr[parent], self.arr[i]
             i = parent
             parent = int(i / 2)
-        # for i in self.arr:
-        #     i.print()
-        # print("next elem")
     # def
     
     def empty(self): # () -> bool
@@ -271,13 +271,12 @@ class SegmentBST:
             return None, None
     
     def swap_segments(self, segment1, segment2, event_queue,x):
-        if segment1.calc(x+0.0000001) < segment2.calc(x+0.0000001):
+        if segment1.calc(x+epsilon) < segment2.calc(x+epsilon):
             segment1, segment2 = segment2, segment1
         # Node1 segment is above the segment of node2 before the intersection
         node1, bigger_node1, smaller_node1 = self.find_node(segment1, self.root, x, self.root.right, self.root.left)
         node2, bigger_node2, smaller_node2 = self.find_node(segment2, self.root, x, self.root.right, self.root.left)
-        print(node1, node2)
-        # Если оба узла найдены, обменяем местами их данные (сегменты)
+        # Swap segments in nodes without changing the tree
         if node1 and node2:
             node1.segment, node2.segment = node2.segment, node1.segment
         neighbour_small, neighbour_big = self.get_neighbours(bigger_node1, node1.left, node1.right, node1, x)
@@ -295,10 +294,9 @@ class SegmentBST:
 
 
     def find_node(self, segment, root, x, bigger_neighbour = None, smaller_neighbour = None):
-        # Рекурсивный поиск узла по сегменту
         if root is None or root.segment.id == segment.id:
             return root, bigger_neighbour, smaller_neighbour
         #because of python is cutting float numbers and it becomes smaller than real, I need to add any very small number to check this condition
-        if segment.calc(x+0.0000000001) < root.segment.calc(x+0.0000000001):
+        if segment.calc(x+epsilon) < root.segment.calc(x+epsilon):
             return self.find_node(segment, root.left, x, root, smaller_neighbour)
         return self.find_node(segment, root.right, x, bigger_neighbour, root)

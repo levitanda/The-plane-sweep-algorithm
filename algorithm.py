@@ -1,4 +1,3 @@
-#import modules
 import mod
 
 def parsing_single_testcase(file, segments):
@@ -16,49 +15,29 @@ def event_queue_initialization(segments, event_priority_queue):
         event_priority_queue.insert((seg,0), seg.q.x)
         event_priority_queue.insert((seg,1), seg.p.x)
 
-def sweep(events):
-    status = None
-    while not events.empty():
-        ev = events.delete()
-        if(ev[1] == False):
-            #add_if_intersection
-            mod.deleteNode(status, ev[0].id)
-
-
 
 def main():
-    filename = "input.txt"
-    print("starting parsing...")
-    with open(filename, "r") as file:
+    with open(mod.filename, "r") as file:
         num_test_cases = int(file.readline())
-        print("num of test cases ", num_test_cases)
         for i in range(num_test_cases):
             segments = []
             parsing_single_testcase(file, segments)
             event_priority_queue = mod.CG24PriorityQueue()
             event_queue_initialization(segments, event_priority_queue)
-            print("the tast case # ",i)
             counter = 0
             sweep_line_status = mod.SegmentBST()
             while not event_priority_queue.empty():
                 s = event_priority_queue.pop()
                 if s[1]==0: #segment begin
-                    print(s[0].q.x, s[0].id)
                     sweep_line_status.insert(s[0], s[0].q.x, event_priority_queue)
                 elif s[1]==1: #segment finish
-                    print(s[0].p.x, s[0].id)
                     sweep_line_status.remove(s[0], s[0].p.x, event_priority_queue)
                 elif s[1]==2: #intersection
-                    print(s[0].x, s[0].y)
                     counter += 1
                     seg1 = s[2]
                     seg2 = s[3]
-                    sweep_line_status.swap_segments(seg1, seg2, event_priority_queue, s[0].x)
-                    
-            print("intersects num: ", counter)
-                    
-
-
+                    sweep_line_status.swap_segments(seg1, seg2, event_priority_queue, s[0].x)           
+            print(counter)
 
 if __name__ == "__main__":
     main()
