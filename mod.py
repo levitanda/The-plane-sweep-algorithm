@@ -252,14 +252,16 @@ class SegmentBST:
             current = current.left
         return current
     
-    def get_neighbours(self, left, right, parent, root, x):
+    def get_neighbours(self, left, right, parent, root, x, another_parent = None):
         difs = []
         if left != None:
             difs.append((left,abs(root.segment.calc(x) - left.segment.calc(x))))
         if right != None:
-            difs.append((left,abs(root.segment.calc(x) - right.segment.calc(x))))
+            difs.append((right,abs(root.segment.calc(x) - right.segment.calc(x))))
         if parent != None:
-            difs.append((left,abs(root.segment.calc(x) - parent.segment.calc(x))))
+            difs.append((parent,abs(root.segment.calc(x) - parent.segment.calc(x))))
+        if another_parent != None:
+            difs.append((another_parent,abs(root.segment.calc(x) - another_parent.segment.calc(x))))    
         difs.sort(key=lambda a: a[1], reverse=True)
         if len(difs) >=2:
             return difs[0][0], difs[1][0]
@@ -267,41 +269,36 @@ class SegmentBST:
             return difs[0][0], None
         else:
             return None, None
-
-
-    # def inorder_traversal(self):
-    #     result = []
-    #     self._inorder_traversal_recursive(self.root, result)
-    #     return result
-
-    # def _inorder_traversal_recursive(self, root, result):
-    #     if root:
-    #         self._inorder_traversal_recursive(root.left, result)
-    #         result.append(root.segment)
-    #         self._inorder_traversal_recursive(root.right, result)
-
-
-
-# # Example usage:
-# if __name__ == "__main__":
-#     # Define your Segment class with attributes id and y
-#     class Segment:
-#         def __init__(self, id, y):
-#             self.id = id
-#             self.y = y
     
-#     # Create an instance of SegmentBST
-#     bst = SegmentBST()
-    
-#     # Insert segments
-#     segments = [Segment(1, 5), Segment(2, 3), Segment(3, 7)]
-#     for segment in segments:
-#         bst.insert(segment)
-    
-#     # Remove a segment by id
-#     bst.remove(2)
-    
-#     # Print inorder traversal of BST
-#     print("Inorder traversal of BST:")
-#     for segment in bst.inorder_traversal():
-#         print(f"Segment id: {segment.id}, y: {segment.y}")
+    def swap_segments(self, segment1, segment2, event_queue,x):
+        if segment1.calc(x+0.0000001) < segment2.calc(x+0.0000001):
+            segment1, segment2 = segment2, segment1
+        # Node1 segment is above the segment of node2 before the intersection
+        node1, bigger_node1, smaller_node1 = self.find_node(segment1, self.root, x, self.root.right, self.root.left)
+        node2, bigger_node2, smaller_node2 = self.find_node(segment2, self.root, x, self.root.right, self.root.left)
+        print(node1, node2)
+        # Если оба узла найдены, обменяем местами их данные (сегменты)
+        if node1 and node2:
+            node1.segment, node2.segment = node2.segment, node1.segment
+        neighbour_small, neighbour_big = self.get_neighbours(bigger_node1, node1.left, node1.right, node1, x)
+        if neighbour_small != None and node1 != None and neighbour_small != node2:
+            l = intersection(neighbour_small.segment, node1.segment)
+            if l != None:
+                if l.x < x:
+                    event_queue.insert((l,2,neighbour_small.segment, node1.segment), l.x)
+        neighbour_small, neighbour_big = self.get_neighbours(smaller_node2, node2.left, node2.right, node2, x)
+        if node2 != None and neighbour_big != None and neighbour_big != node1:
+            l = intersection(node2.segment, neighbour_big.segment)
+            if l != None:
+                if l.x < x:
+                    event_queue.insert((l,2,node2.segment, neighbour_big.segment), l.x)
+
+
+    def find_node(self, segment, root, x, bigger_neighbour = None, smaller_neighbour = None):
+        # Рекурсивный поиск узла по сегменту
+        if root is None or root.segment.id == segment.id:
+            return root, bigger_neighbour, smaller_neighbour
+        #because of python is cutting float numbers and it becomes smaller than real, I need to add any very small number to check this condition
+        if segment.calc(x+0.0000000001) < root.segment.calc(x+0.0000000001):
+            return self.find_node(segment, root.left, x, root, smaller_neighbour)
+        return self.find_node(segment, root.right, x, bigger_neighbour, root)

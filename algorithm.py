@@ -53,7 +53,7 @@ def main():
                     counter += 1
                     seg1 = s[2]
                     seg2 = s[3]
-                    #sweep_line_status.remove(s[0], s[0].x, event_priority_queue)
+                    sweep_line_status.swap_segments(seg1, seg2, event_priority_queue, s[0].x)
                     
             print("intersects num: ", counter)
                     
