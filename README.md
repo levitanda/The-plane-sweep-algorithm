@@ -1,4 +1,4 @@
-# README
+# Sweep line algorithm for counting intersections between segments
 
 ## Introduction
 
