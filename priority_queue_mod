@@ -1,0 +1,56 @@
+from queue import PriorityQueue
+import data_structures_mod as mod 
+
+
+def parsing_single_testcase(file, segments):
+    num_segments = int(file.readline())
+    for id in range(num_segments):
+        x1, y1, x2, y2 = map(float, file.readline().split())
+        p = mod.Point(x1, y1)
+        q = mod.Point(x2, y2)
+        segment = mod.Segment(id,p,q)
+        segments.append(segment)
+
+def event_queue_initialization(segments, event_priority_queue):
+    for seg in segments:
+        #0 - beggining of segment, 1 - ending of segment
+        #print(seg)
+        a = [seg,0]
+        b = [seg,1]
+        event_priority_queue.put((-seg.q.x, seg.id))
+        event_priority_queue.put((-seg.p.x, seg.id))
+
+
+def main():
+    with open(mod.filename, "r") as file:
+        num_test_cases = int(file.readline())
+        for i in range(num_test_cases):
+            segments = []
+            parsing_single_testcase(file, segments)
+            q = PriorityQueue()
+            event_queue_initialization(segments, q)
+            counter = 0
+            sweep_line_status = mod.SegmentBST()
+            name = "out_queue_" + str(i) + ".txt"
+            while not q.empty():
+                s = q.get()
+                segment = segments[s[1]]
+                if segment.q.x == -s[0]:
+                    type = 0
+                elif segment.p.x == -s[0]:
+                    type = 1
+                else:
+                    type = 2
+                if type==0: #segment begin
+                    sweep_line_status.insert(segment, segment.q.x, q)
+                elif type==1: #segment finish
+                    sweep_line_status.remove(segment, segment.p.x, q)
+                elif type==2: #intersection
+                    counter += 1
+                    seg1 = segments[s[1]]
+                    seg2 = segments[s[2]]
+                    sweep_line_status.swap_segments(seg1, seg2, q, -s[0])           
+            print(counter)
+
+if __name__ == "__main__":
+    main()

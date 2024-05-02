@@ -31,12 +31,12 @@ The output contains number of segments intersections per test. Every result ends
 
 To run the program, follow these steps:
 
-1. Into file mod.py update "filename" variable to contain the ASCII input file. Make sure that the file placed in the same directory with code files.
-2. Into file mod.py update "epsilon" variable to contain the minimum difference between variables. It required because the exactly coordinates of intersection points can be infinite numbers.
+1. Into file data_structures_mod.py update "filename" variable to contain the ASCII input file. Make sure that the file placed in the same directory with code files.
+2. Into file mod.py update "epsilon" variable to contain the minimum difference of x coordinate between events. It required because the exactly coordinates of intersection points can be infinite numbers.
 3. Run the main script using the Python interpreter:
 
 ```bash
-python algorithm.py
+python priority_queue_mod.py
 ```
 
 ## Workflow
